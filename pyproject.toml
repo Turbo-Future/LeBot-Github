@@ -9,6 +9,13 @@ python = "^3.8"
 discord = "^1.0.1"
 js = "^1.0"
 Flask = "^1.1.2"
+colorama = "^0.4.3"
+wikipedia = "^1.4.0"
+dhooks = "^1.1.4"
+praw = "^7.1.0"
+utils = "^1.0.1"
+dataio = "^0.0.5"
+mal = "^0.4.0"
 
 [tool.poetry.dev-dependencies]
 

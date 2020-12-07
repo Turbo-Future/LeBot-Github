@@ -7,52 +7,44 @@ class Help(commands.Cog):
   def __init__(self, bot):
     self.bot = bot
 
-  @commands.command()
+  @commands.group(invoke_without_command=True)
   async def help(self, ctx):
-    embed = discord.Embed(title=f'LeBot commands', description='', colour=discord.Colour(random.randint(1, 16777215)))
-    embed.add_field(name= ":gear:Moderation", value= (f"`Type help_mod for more info`"))
-    embed.add_field(name= ":smile:Fun", value= (f"`Type help_fun for more info`"))
-    embed.add_field(name=":tools:Tools", value= (f"`Type help_tools for more info`"))
+    embed = discord.Embed(title=f'LeBot commands', description="", colour=discord.Colour(random.randint(1, 16777215)))
+    embed.add_field(name= ":gear:Moderation", value= (f"Type `help mod for more info"))
+    embed.add_field(name= ":smile:Fun", value= (f"Type `help fun for more info"))
+    embed.add_field(name=":tools:Tools", value= (f"Type `help tools for more info"))
+    embed.add_field(name=":moneybag: Economy", value="Type `help economy for more info")
     await ctx.send(embed=embed)
 
-  @commands.command()
-  async def help_fun(self, ctx):
-    embed_2 = discord.Embed(title=f"Fun commands", description='', colour=discord.Colour(random.randint(1, 16777215)))
-    embed_2.add_field(name= "8ball", value="`Ask the 8ball a question`")
-    embed_2.add_field(name= "dankrate", value= "`How dank are you?`")
-    embed_2.add_field(name= "simprate", value="`How much of a simp are you?`")
-    embed_2.add_field(name= "epicrate", value="`How epic are you?`")
-    embed_2.add_field(name="waifurate", value="`How waifu are you`")
-    embed_2.add_field(name= "roast", value="`As the name says dummy. It roast people`")
-    embed_2.add_field(name= "nny", value="`(͡° ͜ʖ ͡°)`")
-    embed_2.add_field(name= "hack", value="`Get Hacked`")
-    await ctx.send(embed=embed_2)
-    
-  @commands.command()
-  async def help_mod(self, ctx):
-    embed_3 = discord.Embed(title= f" Mod Commands", description="", colour=discord.Colour(random.randint(1, 16777215)))
-    embed_3.add_field(name= "clear", value="`Purges messages.`")
-    embed_3.add_field(name= "kick", value="`Mentioned user gets the boot`")
-    embed_3.add_field(name= "ban", value= "`Mentioned user gets the ban hammer`")
-    embed_3.add_field(name="unban", value="`Member gets unbanned.`")
-    embed_3.add_field(name="prefix", value='`Changes prefix of the bot (Default is "le.")`')
-    embed_3.add_field(name="mute", value="`Mutes a user`")
-    embed_3.add_field(name="unmute", value="`Unmutes a user`")
-    embed_3.add_field(name="lock", value="`Locks the channel the command is used in.`")
-    embed_3.add_field(name= "unlock", value="`Unlocks the channel the command is used in.`")
-    await ctx.send(embed=embed_3)
+  @help.command()
+  async def fun(self, ctx):
+    embed_2 = discord.Embed(title=f":smile:Fun commands", description='', colour=discord.Colour(random.randint(1, 16777215)))
+    embed_2.add_field(name="\u200b", value="`8ball`,`dankrate`,`simprate`,`epicrate`,`waifurate`,`roast`,`nny`,`hack`, `meme`, `food`")
+    await ctx.message.author.send(embed=embed_2)
+    await ctx.send("Check your dm's homie")
+
+  @help.command()
+  async def mod(self, ctx):
+    embed_3 = discord.Embed(title= f":hammer:Mod Commands", description="", colour=discord.Colour(random.randint(1, 16777215)))
+    embed_3.add_field(name= "\u200b", value="`clear`,`kick`,`ban`,`unban`,`mute`,`unmute`,`rolecreate`,`roleadd`,`roleremove`,`roledelete`,`lock`,`unlock`")
+    embed_3.set_footer("Role commands are case sensitive. Make sure to get the role name's right")
+    embed_3.set_footer(text="Role commands are case sensitive. Make sure to get the role name's right")
+    await ctx.message.author.send(embed=embed_3)
+    await ctx.send("Check your dms's homie")
   
-  @commands.command()
-  async def help_tools(self, ctx):
-    embed_4 = discord.Embed(title = f'Tools Commands', description="", colour=discord.Colour(random.randint(1, 16777215)))
-    embed_4.add_field(name= "say", value="`Says stuff`")
-    embed_4.add_field(name="dice", value="`Rolls and imaginary dice`")
-    embed_4.add_field(name="toss", value="`Settle legendary battles over a coin toss`")
-    embed_4.add_field(name= "ping", value="`Shows the ping`")
-    embed_4.add_field(name="stats", value="`Shows the stats of the bot`")
-    embed_4.add_field(name="avatar", value="`Sends avatar URL`")
-    embed_4.add_field(name="invite", value="`Sends bot invite`")
-    await ctx.send(embed=embed_4)
-    
+  @help.command()
+  async def tools(self, ctx):
+    embed_4 = discord.Embed(title = f':nut_and_bolt:Tools Commands', description="", colour=discord.Colour(random.randint(1, 16777215)))
+    embed_4.add_field(name= "\u200b", value="`say`,`dice`,`toss`,`wiki`,`ping`,`avatar`,`stats`,`sinfo`,`userinfo`,`avatar`,`invite`")
+    await ctx.message.author.send(embed=embed_4)
+    await ctx.send("Chek your dm's homie")
+
+  @help.command()
+  async def economy(self, ctx):
+    embed = discord.Embed(title=f":moneybag: Economy Commands", colour=discord.Colour.gold())
+    embed.add_field(name="\u200b", value="`balance`,`withdraw`,`deposit`,`daily`,`beg`,`inventory`,`shop`,`buy`,`sell`,`slots`,`send`,`rob`,`heist`,`work`,`gamble`, `passive`")
+    await ctx.message.author.send(embed=embed)
+    await ctx.send("Check your dm's homie")
+
 def setup(bot):
   bot.add_cog(Help(bot))

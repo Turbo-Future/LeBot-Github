@@ -1,22 +1,23 @@
 import discord
-import random
-import time
 import os
+import time
 import json
-import asyncio
 import keep_alive
+from colorama import Fore
+from settings import token
 from discord.ext import commands, tasks
 
 def get_prefix(bot, message):
-  with open('prefixes.json','r') as f:
+  with open("prefixes.json", "r") as f:
     prefixes = json.load(f)
 
-    return prefixes[str(message.guild.id)]
+  return prefixes[str(message.guild.id)]
 
+intents = discord.Intents().all()
+bot = commands.Bot(command_prefix = get_prefix, intents=intents)
+bot.blacklisted_users = []
 
-bot = commands.Bot(command_prefix = get_prefix)
 bot.remove_command('help')
-
 #Cogs
 
 @bot.command()
@@ -33,70 +34,48 @@ for filename in os.listdir('./cogs/'):
   if filename.endswith('.py'):
       bot.load_extension(f'cogs.{filename[:-3]}')
 
+@tasks.loop(minutes=1)
+async def poggers():
+  channel=bot.get_channel(763763048401338399)
+  await channel.send("poggers")
 
 #events
 
 @bot.event
-async def on_ready():
-  change_activity.start()
-  print('Bot is ready')
+async def on_message(message):
+    if message.author.id in bot.blacklisted_users:
+        return
 
-def RAG():
-    activity_type = random.choice(['watchin','listenin','playin'])
-    activity = ''
-    if activity_type == 'watchin':
-        activity = random.choice(watchin)
-    elif activity_type == 'listenin':
-        activity = random.choice(listenin)
-    else:
-        activity = random.choice(playin)
-    return activity_type, activity
+    await bot.process_commands(message)
 
-playin = ["Pewdiepies Pixelings | lehelp",
-          "Brawl Stars | lehelp",
-          "Tuber Simulator | lehelp"]
-listenin = ["anime theme songs | lehelp",
-            "Rickroll | lehelp",
-            "Complaints | lehelp",
-            "Eminem's Songs | lehelp"]
-watchin = ["YouTube | lehelp",
-           "Anime | lehelp",
-           "Meme Review | lehelp",
-           'LWIAY | lehelp']
+    if message.content == "<@!734379671126278145>":
+      with open("prefixes.json", "r") as f:
+        prefixes = json.load(f)
+        
+        prefix = prefixes[str(message.guild.id)]
 
-@tasks.loop(seconds=60)
-async def change_activity():
-    activity_type, activity = RAG()
-    if activity_type == 'playin':
-        await bot.change_presence(status=discord.Status.dnd, activity=discord.Game(name=activity))
-    elif activity_type == 'listenin':
-        await bot.change_presence(status=discord.Status.dnd, activity=discord.Activity(type=discord.ActivityType.listening, name=activity))
-    else:
-        await bot.change_presence(status=discord.Status.dnd, activity=discord.Activity(type=discord.ActivityType.watching, name=activity))
+      await message.channel.send(f"The server prefix is \"**{prefix}**\"")
+      return
 
 @bot.event
 async def on_guild_join(guild):
-    with open('prefixes.json','r') as f:
+    with open("prefixes.json", "r") as f:
       prefixes = json.load(f)
 
-    prefixes[str(guild.id)] = 'le'
+      prefixes[str(guild.id)] = "le"
 
-    with open('prefixes.json', 'w') as f:
-      json.dump(prefixes, f, indent=4)
-      for channel in guild.text_channels:
-        if channel.permissions_for(guild.me).send_messages:
-            await channel.send('Hey there! Thanks for adding me to the server! My default prefix is "le"')
-        break
+      with open('prefixes.json', "w") as f:
+        json.dump(prefixes, f, indent=4)  
 
 @bot.event
 async def on_guild_remove(guild):
-  with open('prefixes.json','r') as f:
-      prefixes = json.load(f)
-      
-      prefixes.pop(str(guild.id))
+  with open("prefixes.json", "r") as f:
+    prefixes = json.load(f)
 
-      with open('prefixes.json', 'w') as f:
-        json.dump(prefixes, f, indent=4)
+  prefixes.pop(str(guild.id))
+
+  with open("prefixes.json", "w") as f:
+    json.dump(prefixes, f, indent=4)
 
 @bot.event
 async def on_member_join(member):
@@ -112,23 +91,27 @@ async def on_member_remove(member):
             await channel.send(f'Alexa this is so sad, {member.name} has left the server, please play despacito')
 
 
-#Tools
+#.mention for role in roles
 
-@bot.command(aliases=['stats','STATS'])
-async def Stats(ctx):
-    embed = discord.Embed(title=f'{bot.user.name} Stats', description="", colour=discord.Colour(random.randint(1, 16777215)))
-    embed.add_field(name='Total Servers:', value=str(len(bot.guilds)))
-    embed.add_field(name='Total Users in the server:', value=len(ctx.guild.members))
-    embed.add_field(name='Bot Developer:', value="Dio#2097")
-    embed.add_field(name ="Latency:", value=f"{round(bot.latency * 1000)} ms")
-    embed.set_author(name=bot.user.name, icon_url=bot.user.avatar_url)
-    await ctx.send(embed=embed)
+#Owner commands
 
-@bot.command(aliases=['pong','latency'])
-async def ping(ctx):
-  await ctx.send(f'Latency: {round(bot.latency * 1000)}ms')
+@bot.command()
+@commands.is_owner()
+async def bot_guild(ctx):
+    await ctx.send("Printed server names")
+    for guild in bot.guilds:
+      print(Fore.GREEN + guild.name)
+
+@bot_guild.error
+async def bot_guild_error(ctx, error):
+    if isinstance(error, commands.NotOwner):
+      print(Fore.BLUE + f"{ctx.author} in {ctx.author.guild} has used bot_guild command")
+
+
+
+#Testing
+
 
 
 keep_alive.keep_alive()
-token = os.environ.get("token")
 bot.run(token)

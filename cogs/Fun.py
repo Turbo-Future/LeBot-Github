@@ -1,6 +1,7 @@
 import discord
 import random
-import time
+import asyncio
+import os
 from discord.ext import commands
 
 class Fun(commands.Cog):
@@ -36,34 +37,34 @@ class Fun(commands.Cog):
                  "REEEEEEEEEEEEEEEEEEEEEE"]
     await ctx.send(f'Question: {question}\nAnswer: {random.choice(Responses)}')
 
+  @_8ball.error
+  async def _8ball_error(self, ctx, error):
+    if isinstance(error, commands.MissingRequiredArgument):
+      await ctx.send("What's the question?")
+
   @commands.command()
-  async def dankrate(self, ctx, member: discord.Member):
-    dankrate_response = random.randint(1,100)
-    await ctx.send(f"{member.name}'s' dankrate is "+str(dankrate_response)+"%")
+  async def dankrate(self, ctx, member: discord.Member=None):
+    if member == None:
+      member = ctx.author
+    dankrate_response = [f"{member.name}'s dankrate is {random.randint(1, 30)}% :sweat:", f"{member.name}'s dankrate is {random.randint(31, 50)}% :eyes:", f"{member.name}'s dankrate is {random.randint(51, 70)}% :pensive:", f"{member.name}'s dankrate is {random.randint(71, 90)}% :star_struck:", f"{member.name}'s dankrate is {random.randint(91, 100)}% :sunglasses:"]
+    await ctx.send(random.choice(dankrate_response))
 
   @dankrate.error
-  async def dankrate_error(self, ctx, error):
-    if isinstance(error, commands.MissingRequiredArgument):
-      await ctx.send(f"Your dankrate is {random.randint(1, 100)}%")
-
+  async def dankrater_error(self, ctx, error):
+    if isinstance(error, commands.BadArgument):
+      await ctx.send('Couldnt find the user. If the user has a space in their name use "<name>". EG- {prefix}dankrate "WILLY WONKA"')
+      
   @commands.command()
-  async def epicrate(self, ctx, member: discord.Member):
-    await ctx.send(f"{member.name} is {random.randint(1, 100)}% epic")
-
-  @epicrate.error
-  async def epicrate_error(self, ctx, error):
-    if isinstance(error, commands.MissingRequiredArgument):
-      await ctx.send(f"Your {random.randint(1, 100)}% epic")
-
-  @commands.command(aliases=["picrate"])
-  async def simprate(self, ctx, member: discord.Member):
-    simprate_response = random.randint(1,100)
-    await ctx.send(f"{member.name}'s simprate is "+str(simprate_response)+"%")
+  async def simprate(self, ctx, member: discord.Member=None):
+    if member == None:
+       member = ctx.author
+    simprate_response = [f"{member.name}'s simprate is {random.randint(1, 30)}% :sweat:", f"{member.name}'s simprate is {random.randint(31, 50)}% :eyes:", f"{member.name}'s simprate is {random.randint(51, 70)}% :pensive:", f"{member.name}'s simprate is {random.randint(71, 90)}% :star_struck:", f"{member.name}'s simprate is {random.randint(91, 100)}% :sunglasses:"]
+    await ctx.send(random.choice(simprate_response))
 
   @simprate.error
   async def simprate_error(self, ctx, error):
-    if isinstance(error, commands.MissingRequiredArgument):
-      await ctx.send(f"Your simprate is {random.randint(1,100)}%")
+    if isinstance(error, commands.BadArgument):
+      await ctx.send('Couldnt find the user. If the user has a space in their name use "<name>". EG- {prefix}simprate "WILLY WONKA"')
 
   @commands.command(aliases=["waifu"])
   async def waifurate(self, ctx, member: discord.Member=None):
@@ -72,6 +73,11 @@ class Fun(commands.Cog):
     waifurate_response = [f"{member.name}'s {random.randint(1,30)}% waifu :face_vomiting:",f" {member.name}'s {random.randint(31, 50)}% waifu :tired_face:", f"{member.name}'s {random.randint(51, 70)}% waifu :grimacing:", f"{member.name}'s {random.randint(71, 90)}% waifu :smirk:", f"{member.name}'s {random.randint(91, 100)}% waifu :sunglasses:"]
     await ctx.send(random.choice(waifurate_response))
         
+  @waifurate.error
+  async def waifurate_error(self, ctx, error):
+    if isinstance(error, commands.BadArgument):
+      await ctx.send('Couldnt find the user. If the user has a space in their name use "<name>". EG- {prefix}waifurate "WILLY WONKA"')
+
   @commands.command(aliases=["lenny"])
   async def nny(self, ctx):
     await ctx.send("( ͡° ͜ʖ ͡°)")
@@ -95,6 +101,14 @@ class Fun(commands.Cog):
     f'{member.name} fell down a cliff while playing pokemon go']
     await ctx.send(f'{random.choice(kill_response)}')
 
+  @kill.error
+  async def kill_error(self, ctx, error):
+    if isinstance(error, commands.MissingRequiredArgument):
+      await ctx.send("Who do you want me to... take out?")
+    else:
+      if isinstance(error, commands.BadArgument):
+        await ctx.send("I cant kill someone who doesnt exist.")
+
   @commands.command()
   async def roast(self, ctx, member: discord.Member):
     roast_response = ['You’re the reason God created the middle finger.',
@@ -115,42 +129,54 @@ class Fun(commands.Cog):
     "If laughter is the best medicine, you're face must be curing the world"]
     await ctx.send(f'{random.choice(roast_response)}')
 
+  @roast.error
+  async def roast_error(self, ctx, error):
+    if isinstance(error, commands.MissingRequiredArgument):
+      await ctx.send("Who gonna get the burn?")
+    else:
+      if isinstance(error,commands.BadArgument):
+        await ctx.send("Mention a real person. Not your imaginary friend")
+
   @commands.command(aliases=['hack','HACK'])
   async def Hack(self,ctx, member : discord.Member):
     if {member.name} == {ctx.author.name}:
       await ctx.send(f"How do you hack yourself")
     else:
       message = await ctx.send(f" Hacking {member.name} right now chief")
-      time.sleep(2)
+      await asyncio.sleep(2)
       await message.edit(content=f"Fetching IP adress")
-      time.sleep(2)
+      await asyncio.sleep(2)
       await message.edit(content=f"IP found 182.110.224.90")
-      time.sleep(2)
+      await asyncio.sleep(2)
       await message.edit(content=f"Fetching Email and Password")
-      time.sleep(2)
+      await asyncio.sleep(2)
       hack_response_email = [f'{member.name}sucks@gmail.com',
       f'{member.name}hasnofriends@gmail.com']
       hack_response_password = ['iliketseries',
       'forgotten',
       'whyarewestillhere']
       await message.edit(content=f"**Email:** {random.choice(hack_response_email)}\n**Password:** {random.choice(hack_response_password)}")
-      time.sleep(2)
+      await asyncio.sleep(2)
       hack_Response_tabs = ['animehentai.com',
       "reddit.com",
       "useless.com",
       "howtogetfriends.com"]
       await message.edit(content=f"Fetching recently closed tabs")
-      time.sleep(2)
+      await asyncio.sleep(2)
       await message.edit(content=f"{random.choice(hack_Response_tabs)}")
-      time.sleep(2)
+      await asyncio.sleep(2)
       await message.edit(content=f"Trojan Injected")
-      time.sleep(2)
+      await asyncio.sleep(2)
       await message.edit(content=f"Hack completed chief")
 
   @Hack.error
   async def hack_error(self, ctx, error):
     if isinstance(error, commands.MissingRequiredArgument):
       await ctx.send("Who do you want me to hack?")
+    else:
+      if isinstance(error, commands.BadArgument):
+        await ctx.send("Hacking them right now cheif... Oh wait, you didnt mention a real person.")
+
 
 
 def setup(bot):
