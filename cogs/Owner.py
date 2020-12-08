@@ -20,10 +20,9 @@ class Owner(commands.Cog):
 
   @commands.Cog.listener()
   async def on_ready(self):
-    await self.bot.change_presence(activity=discord.Streaming(name="@LeBot Beta", url="https://www.youtube.com/watch?v=dQw4w9WgXcQ"))
-    print('Bot is ready')
     data = read_json("blacklist")
     self.bot.blacklisted_users = data["blacklistedUsers"]
+    print("Bot is ready")
 
   @commands.command(aliases=["break"])
   @commands.is_owner()

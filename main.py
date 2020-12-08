@@ -1,6 +1,6 @@
 import discord
 import os
-import time
+import random
 import json
 import keep_alive
 from colorama import Fore
@@ -34,12 +34,43 @@ for filename in os.listdir('./cogs/'):
   if filename.endswith('.py'):
       bot.load_extension(f'cogs.{filename[:-3]}')
 
-@tasks.loop(minutes=1)
-async def poggers():
-  channel=bot.get_channel(763763048401338399)
-  await channel.send("poggers")
+#Events
 
-#events
+@bot.event
+async def on_ready():
+    change_activity.start()
+
+def RAG():
+    activity_type = random.choice(['watchin','listenin','playin'])
+    activity = ''
+    if activity_type == 'watchin':
+        activity = random.choice(watchin)
+    elif activity_type == 'listenin':
+        activity = random.choice(listenin)
+    else:
+        activity = random.choice(playin)
+    return activity_type, activity
+
+playin = ["Fall Guys | @LeBot",
+          "CS:GO | @LeBot",
+          "WATCHDOGS 2 | @LeBot",
+          "Among Us | @LeBot",]
+listenin = ["Spotify | @LeBot",
+            "Complaints",
+            "Eminem's Songs"]
+watchin = ["YouTube | @LeBot",
+           "Anime | @LeBot",
+           "Meme Review | @LeBot"]
+
+@tasks.loop(seconds=60)
+async def change_activity():
+    activity_type, activity = RAG()
+    if activity_type == 'playin':
+        await bot.change_presence(status=discord.Status.dnd, activity=discord.Game(name=activity))
+    elif activity_type == 'listenin':
+        await bot.change_presence(status=discord.Status.dnd, activity=discord.Activity(type=discord.ActivityType.listening, name=activity))
+    else:
+        await bot.change_presence(status=discord.Status.dnd, activity=discord.Activity(type=discord.ActivityType.watching, name=activity))
 
 @bot.event
 async def on_message(message):
@@ -48,7 +79,7 @@ async def on_message(message):
 
     await bot.process_commands(message)
 
-    if message.content == "<@!734379671126278145>":
+    if message.content == "<@!716323508472381510>":
       with open("prefixes.json", "r") as f:
         prefixes = json.load(f)
         
@@ -106,12 +137,6 @@ async def bot_guild(ctx):
 async def bot_guild_error(ctx, error):
     if isinstance(error, commands.NotOwner):
       print(Fore.BLUE + f"{ctx.author} in {ctx.author.guild} has used bot_guild command")
-
-
-
-#Testing
-
-
 
 keep_alive.keep_alive()
 bot.run(token)
