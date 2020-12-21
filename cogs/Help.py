@@ -1,5 +1,6 @@
 import discord
 import random
+import json
 from discord.ext import commands
 
 class Help(commands.Cog):
@@ -9,11 +10,15 @@ class Help(commands.Cog):
 
   @commands.group(invoke_without_command=True)
   async def help(self, ctx):
+    with open("prefixes.json", "r") as f:
+        prefixes = json.load(f)
+        
+        prefix = prefixes[str(ctx.guild.id)]
     embed = discord.Embed(title=f'LeBot commands', description="", colour=discord.Colour(random.randint(1, 16777215)))
-    embed.add_field(name= ":gear:Moderation", value= (f"Type `help mod for more info"))
-    embed.add_field(name= ":smile:Fun", value= (f"Type `help fun for more info"))
-    embed.add_field(name=":tools:Tools", value= (f"Type `help tools for more info"))
-    embed.add_field(name=":moneybag: Economy", value="Type `help economy for more info")
+    embed.add_field(name= ":gear:Moderation", value= (f"Type {prefix}help mod for more info"))
+    embed.add_field(name= ":smile:Fun", value= (f"Type {prefix}help fun for more info"))
+    embed.add_field(name=":tools:Tools", value= (f"Type {prefix}help tools for more info"))
+    embed.add_field(name=":moneybag: Economy", value=f"Type {prefix}help economy for more info")
     await ctx.send(embed=embed)
 
   @help.command()
@@ -27,8 +32,7 @@ class Help(commands.Cog):
   async def mod(self, ctx):
     embed_3 = discord.Embed(title= f":hammer:Mod Commands", description="", colour=discord.Colour(random.randint(1, 16777215)))
     embed_3.add_field(name= "\u200b", value="`clear`,`kick`,`ban`,`unban`,`mute`,`unmute`,`rolecreate`,`roleadd`,`roleremove`,`roledelete`,`lock`,`unlock`")
-    embed_3.set_footer("Role commands are case sensitive. Make sure to get the role name's right")
-    embed_3.set_footer(text="Role commands are case sensitive. Make sure to get the role name's right")
+    embed_3.set_footer(text = "Role commands are case sensitive. Make sure to get the role name's right")
     await ctx.message.author.send(embed=embed_3)
     await ctx.send("Check your dms's homie")
   

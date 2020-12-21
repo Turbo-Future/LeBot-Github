@@ -92,25 +92,10 @@ class image(commands.Cog):
       #likes
       d.text((422, 402), f"{random.randrange(5000, 15001)}", fill=(0,0,0), font=font4)
       #Time + Device
-      d.text((24,337), f"{time.strftime('%X')}",fill=(128,128,128), font=font2)
+      d.text((24,337), f"{time.strftime('%X')} UTC" ,fill=(128,128,128), font=font2)
       #Image
       image.save('./Images/tweeted.jpg')
       await ctx.send(file=discord.File('./Images/tweeted.jpg'))
-
-    @commands.command()
-    async def text(self, ctx, *, text=None):
-      if text == None:
-        text = "What's the text my dood"
-      #First value the in the line below shows the width, and the second value shows the length
-      img = Image.new('RGB', (500, 100), color = (73, 109, 137))
-  
-      font = ImageFont.truetype(r'./Fonts/ARIAL.TTF', 17)
-      d = ImageDraw.Draw(img)
-      #Value one is pixel stuff. Fill, is the RGB color
-      d.text((10,10), f"{text}", fill=(255,255,0), font=font)
-
-      img.save('./Images/hello.jpg')
-      await ctx.send(file=discord.File('./Images/hello.jpg'))
 
 def setup(bot):
     bot.add_cog(image(bot))

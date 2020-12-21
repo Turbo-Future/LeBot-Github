@@ -141,12 +141,13 @@ class Tools(commands.Cog):
 
   @commands.command()
   @commands.cooldown(1, 180, commands.BucketType.user)
-  async def suggest(self, ctx, suggestion=None):
+  async def suggest(self, ctx, *, suggestion=None):
     if suggestion == None:
       await ctx.send("Noob what you wanna suggest")
     else:
       channel = self.bot.get_channel(778534827456069643)
-      await channel.send(f"LeBot Beta Suggestion:\n{suggestion}\n\n\n```{ctx.author} ({ctx.author.id}) \nGuild name: {ctx.guild.name}\n Guild ID:{ctx.guild.id}```")
+      await channel.send(f"LeBot Suggestion:\n{suggestion}\n\n\n```{ctx.author} ({ctx.author.id}) \nGuild name: {ctx.guild.name}\n Guild ID:{ctx.guild.id}```")
+      await ctx.send("Thank you for the suggestion.")
 
   @suggest.error
   async def suggest_error(self, ctx, error):

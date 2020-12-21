@@ -34,7 +34,7 @@ class Owner(commands.Cog):
 
   @commands.command(aliases=["cast"])
   @commands.is_owner()
-  async def broadcast(self,ctx, *,arg):
+  async def textcast(self,ctx, *,arg):
     await ctx.send("Casted the message")
     for guild in self.bot.guilds:
       await guild.text_channels[0].send(f"**{arg}**")

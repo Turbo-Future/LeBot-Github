@@ -3,6 +3,7 @@ import json
 import random
 from discord.ext import commands
 
+#Functions
 #Work
 
 youtuber = {}
@@ -45,7 +46,7 @@ def passive_nub():
   except FileNotFoundError:
         print("Error")
 
-#Shop
+#Money
 
 async def open_account(user):
 
@@ -79,21 +80,7 @@ async def update_bank(user, change=0, mode="wallet"):
     bal = users[str(user.id)]["wallet"], users[str(user.id)]["bank"]
     return bal
 
-
-mainshop = [{
-    "name": "Cookie",
-    "price": 10,
-    "description": "Grandma's tasty cookies! Yum"
-}, {
-    "name": "Laptop",
-    "price": 500,
-    "description": "Post some dank meme's"
-}, {
-    "name": "PC",
-    "price": 1000,
-    "description": "Gaming PC"
-}]
-
+#Shop
   
 async def buy_this(user, item_name, amount):
     item_name = item_name.lower()
@@ -136,7 +123,7 @@ async def buy_this(user, item_name, amount):
         obj = {"item": item_name, "amount": amount}
         users[str(user.id)]["bag"] = [obj]
 
-    with open("inventory.json", "w") as f:
+    with open("bank.json", "w") as f:
         json.dump(users, f)
 
     await update_bank(user, cost * -1, "wallet")
@@ -183,12 +170,62 @@ async def sell_this(user, item_name, amount, price=None):
     except:
         return [False, 3]
 
-    with open("invnetory.json", "w") as f:
+    with open("bank.json", "w") as f:
         json.dump(users, f)
 
     await update_bank(user, cost, "wallet")
 
     return [True, "Worked"]
+
+async def use_this(user, item_name, amount):
+    item_name = item_name.lower()
+    name_ = None
+    for item in mainshop:
+        name = item["name"].lower()
+        if name == item_name:
+            name_ = name
+            break
+
+    if name_ == None:
+        return [False, 1]
+
+    users = await get_bank_data()
+
+    bal = await update_bank(user)
+
+    try:
+        index = 0
+        t = None
+        for thing in users[str(user.id)]["bag"]:
+            n = thing["item"]
+            if n == item_name:
+                old_amt = thing["amount"]
+                new_amt = old_amt - amount
+                if new_amt < 0:
+                    return [False, 2]
+                users[str(user.id)]["bag"][index]["amount"] = new_amt
+                t = 1
+                break
+            index += 1
+        if t == None:
+            return [False, 3]
+    except:
+        return [False, 3]
+
+    with open("bank.json", "w") as f:
+        json.dump(users, f)
+
+    return [True, "Worked"]
+
+mainshop = [{
+    "name": "Cookie",
+    "price": 10,
+    "description": "Grandma's tasty cookies! Yum"
+}, {
+    "name": "Laptop",
+    "price": 500,
+    "description": "Post some dank meme's"
+}]
 
 class Economy(commands.Cog):
     def __init__(self, bot):
@@ -339,7 +376,8 @@ class Economy(commands.Cog):
 
             cd = round(error.retry_after)
             hours = str(cd // 3600)
-            minutes = str(cd // 1440)
+            minutes = str(cd % 3600 // 60)
+            s = str(cd % 3600 % 60)
 
             embed.add_field(
                 name="\u200b",
@@ -652,9 +690,9 @@ class Economy(commands.Cog):
         except:
             bag = []
 
-        em = discord.Embed(title=f"{user.name}'s Inventory")
+        em = discord.Embed(title=f"{user.name}'s Inventory", color=discord.Colour.dark_gold())
         for item in bag:
-            name = item["item"]
+            name = item["item"].capitalize()
             amount = item["amount"]
 
             if amount == 0:
@@ -664,7 +702,7 @@ class Economy(commands.Cog):
                     "Use {prefix}shop to find out what's available on the shop!"
                 )
             else:
-                em.add_field(name=name, value=amount)
+                em.add_field(name=name, value=amount, inline=False)
 
         await ctx.send(embed=em)
 
@@ -706,6 +744,28 @@ class Economy(commands.Cog):
         await ctx.send(f"You just sold {amount} {item}.")
 
     @commands.command()
+    async def use(self, ctx, item_name, amount=1):
+      await open_account(ctx.author)
+      #Making sure the thing works
+      res = await use_this(ctx.author, item_name, amount)
+
+      if not res[0]:
+          if res[1] == 1:
+            await ctx.send("Item doesnt even exist in the mainshop smh.")
+            return
+          if res[1] == 2:
+            await ctx.send(f"You don't have that many {item_name}'s in your inventory.")
+            return
+          if res[1] == 3:
+            await ctx.send(f"You don't have {item_name} in your bag.")
+            return
+
+      for item in mainshop:
+        item_name = item["name"].lower()
+        if item_name == "cookie":
+          await ctx.send("You ate cookie. It was tasty")
+
+    @commands.command()
     async def search(self, ctx):
         await open_account(ctx.author)
 
@@ -734,14 +794,16 @@ class Economy(commands.Cog):
             await ctx.send("Thats not a part of the list tho?")
 
     @commands.command()
-    @commands.cooldown(2, 3600, commands.BucketType.user)
+    @commands.cooldown(1, 3600, commands.BucketType.user)
     async def work(self, ctx):
       await open_account(ctx.author)
+      #Cooldown reset
       #Variables
       salary = 2200
       id = str(ctx.author.id)
       #If user is unemployed :laughard:
       if id not in developer and id not in scientist and id not in youtuber:
+        self.work.reset_cooldown(ctx)
         await ctx.send("Your unemployed, You can work as a `developer` or a `scientist` or a `youtuber` . Pick one.\n\nNote: All jobs have the same amount of salary")
         message = await self.bot.wait_for('message', check=lambda message : message.author == ctx.author)
         #Developer
@@ -765,7 +827,7 @@ class Economy(commands.Cog):
             json.dump(youtuber, f, ) 
           await ctx.send("Congratualations! You now work as a scientist!")
         else:
-          await ctx.send("That's not a part of the list. Since you can't read, wait for an hour.")
+          await ctx.send("That's not a part of the list.")
           return
       #Dev work
       elif id in developer:
@@ -899,13 +961,12 @@ class Economy(commands.Cog):
     @work.error
     async def work_error(self, ctx, error):
         if isinstance(error, commands.CommandOnCooldown):
-            embed = discord.Embed(
-                title="Your on a cooldown!", color=discord.Color.blue())
-        embed.add_field(
-            name="\u200b",
-            value=
-            f"Slow down will ya?\n Wait for {round(error.retry_after)} seconds"
-        )
+            cd = round(error.retry_after)
+            hours = str(cd // 3600)
+            minutes = str(cd % 3600 // 60)
+            s = str(cd % 3600 % 60)
+            embed = discord.Embed(title="Your on a cooldown!", color=discord.Color.blue())
+        embed.add_field(name="\u200b",value=f"Slow down will ya?\n Wait for `{self.leadingZero(hours)}hr{self.leadingZero(minutes)}mins`")
         await ctx.send(embed=embed)
 
     @commands.command()
@@ -919,21 +980,21 @@ class Economy(commands.Cog):
         return
       #If the user has a job
       #developer
-      if (id in developer):
+      if id in developer:
         del developer[id]
-        with open('developer.json', 'w+') as f:
+        with open('./Jobs/developer.json', 'w+') as f:
           json.dump(developer, f)
-          await ctx.send("Congrats! You're unemployed")
+        await ctx.send("Congrats! You're unemployed")
       #scientist
       elif id in scientist:
         del scientist[id]
-        with open('scientist.json', 'w+') as f:
+        with open('./Jobs/scientist.json', 'w+') as f:
           json.dump(scientist, f)
           await ctx.send("Congrats! You're unemployed")
       #youtuber
       elif id in youtuber:
         del youtuber[id]
-        with open('youtuber.json', 'w+') as f:
+        with open('./Jobs/youtuber.json', 'w+') as f:
           json.dump(youtuber, f)
           await ctx.send("Congrats! You're unemployed")
     
@@ -959,11 +1020,11 @@ class Economy(commands.Cog):
         await ctx.send("Are you sure you want to join passive mode?")
       message = await self.bot.wait_for('message', check=lambda message : message.author == ctx.author)
       #If no
-      if message.content == "no":
+      if message.content.lower() == "no":
         await ctx.send("Ok, guess not")
         return
         #If yes
-      elif message.content == "yes":
+      elif message.content.lower() == "yes":
         #Id not in passive
         if id not in passive:
           passive[id] = 1

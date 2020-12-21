@@ -53,7 +53,7 @@ def RAG():
 
 playin = ["Fall Guys | @LeBot",
           "CS:GO | @LeBot",
-          "WATCHDOGS 2 | @LeBot",
+          "Cyberpunk 2077 | @LeBot",
           "Among Us | @LeBot",]
 listenin = ["Spotify | @LeBot",
             "Complaints",
