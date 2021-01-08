@@ -10,6 +10,5 @@
 
 *If you wanna contact me, here's all the social media I use:*
 
-Discord - Dio#2097
 Twitter - [@Turbo_Future](https://twitter.com/Turbo_Future)
 
