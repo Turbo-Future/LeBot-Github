@@ -97,5 +97,36 @@ class image(commands.Cog):
       image.save('./Images/tweeted.jpg')
       await ctx.send(file=discord.File('./Images/tweeted.jpg'))
 
+    @commands.command()
+    async def opinion(self, ctx, *, opinion=None):
+      if opinion == None:
+        await ctx.send("What is your opinion?")
+      else:
+        image = Image.open('./Images/opinion.jpg')
+        font = ImageFont.truetype(r'./Fonts/ARIAL.TTF', 50)
+        d = ImageDraw.Draw(image)
+        d.text((300,560), f"{opinion}", fill=(0,0,0), font=font)
+
+        image.save("./Images/opinion2.jpg")
+        await ctx.send(file=discord.File("./Images/opinion2.jpg"))
+
+    @commands.command()
+    async def spank(self, ctx, user : discord.Member = None):
+        user = ctx.author if not user else user
+        im = Image.open('./Images/spank.jpg')
+        asset = user.avatar_url_as(format=None, static_format='jpg', size=128)
+        data = BytesIO(await asset.read())
+        pfp2 = Image.open(data)
+        asset2 = ctx.author.avatar_url_as(format=None, static_format='jpg', size=128)
+        data2 = BytesIO(await asset2.read())
+        pfp = Image.open(data2)
+        pfp = pfp.resize((120, 134))
+        pfp2 = pfp2.resize((105, 109))
+        im = im.copy()
+        im.paste(pfp, (150, 69))
+        im.paste(pfp2, (269, 202))
+        im.save('./Images/spanked.jpg')
+        await ctx.send(file=discord.File('./Images/spanked.jpg'))
+
 def setup(bot):
     bot.add_cog(image(bot))

@@ -386,7 +386,7 @@ class Economy(commands.Cog):
             )
             await ctx.send(embed=embed)
 
-    @commands.command(aliases=["gift"])
+    @commands.command()
     @commands.cooldown(1, 10, commands.BucketType.user)
     async def send(self, ctx, amount=None, *, member: discord.Member):
         await open_account(ctx.author)

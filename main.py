@@ -1,10 +1,13 @@
 import discord
 import os
 import random
+import asyncio
 import json
+import time
 import keep_alive
 from colorama import Fore
 from settings import token
+from discord import Embed
 from discord.ext import commands, tasks
 
 def get_prefix(bot, message):
@@ -121,8 +124,55 @@ async def on_member_remove(member):
         if str(channel) == "welcome":
             await channel.send(f'Alexa this is so sad, {member.name} has left the server, please play despacito')
 
+@bot.event
+async def on_message_edit(before, after):
+  if before.guild.id == "707490932655652945":
+        embed = Embed(description=f"Message edited in {before.channel.mention}", color=0x4040EC)
+        embed.set_author(name=before.author, url=Embed.Empty, icon_url=before.author.avatar_url)
+        embed.add_field(name="Original Message", value=before.content)
+        embed.add_field(name="Edited Message", value=after.content)
+        embed.timestamp = after.created_at
+        channel=bot.get_channel(772730486912450581)
+        await channel.send(embed=embed)
 
 #.mention for role in roles
+
+#Testing
+
+snipe_message_content = None
+snipe_message_author = None
+snipe_message_id = None
+
+@bot.event
+async def on_message_delete(message):
+
+    global snipe_message_content
+    global snipe_message_author
+    global snipe_message_id
+
+    snipe_message_content = message.content
+    snipe_message_author = message.author
+    snipe_message_id = message.id
+    await asyncio.sleep(60)
+
+    if message.id == snipe_message_id:
+        snipe_message_author = None
+        snipe_message_content = None
+        snipe_message_id = None
+
+
+t = time.localtime()
+current_time = time.strftime("%H:%M", t)
+
+@bot.command()
+async def snipe(message):
+    if snipe_message_content==None:
+        await message.channel.send("Theres nothing to snipe.")
+    else:
+        embed = discord.Embed(title=f"Good luck covering that one up {snipe_message_author}",description=f"{snipe_message_content}", colour=discord.Colour.red())
+        embed.set_footer(text=f"Asked by {message.author.name}#{message.author.discriminator} at {current_time}", icon_url=message.author.avatar_url)
+        await message.channel.send(embed=embed)
+        return
 
 #Owner commands
 
