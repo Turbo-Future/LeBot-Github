@@ -1,10 +1,10 @@
 #### **Yo wassup**
 
-#### **Yo wassup**
+**This is my bot's code. I am pretty new to coding so some stuff will seem very dumb and could've done in a much easier way but whatever.**
 
-*Welcome to my bots coding stuff. Just wonder around or something. Im new to coding I dont know much python so yeah. Basically im a noob at coding.*
+**The bot is offically closed. The bot will be running however, will not recive any updates.**
 
-*If you wanna support me you can do so by adding my bot to your server, here's the invite link.*
+**Thank you for reading this.**
 
 [Discord Bot Invite](https://discord.com/api/oauth2/authorize?client_id=716323508472381510&permissions=8&scope=bot)
 
