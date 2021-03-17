@@ -1,6 +1,6 @@
 #### **Yo wassup**
 
-**This is my bot's code. I am pretty new to coding so some stuff will seem very dumb and could've done in a much easier way but whatever.**
+**This is my bot's code. As of writing this, I'm new to coding so some stuff will seem very dumb and could've done in a much easier way but whatever.**
 
 **The bot is offically closed. The bot will be running however, will not receive any updates.**
 
